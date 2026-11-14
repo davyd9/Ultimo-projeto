@@ -1,4 +1,3 @@
-
 package com.example.myapplication
 
 import android.os.Bundle
@@ -23,24 +22,48 @@ class MainActivity : ComponentActivity() {
                     mutableStateOf("Jogador")
                 }
 
-                if (telaAtual == "login") {
+                when (telaAtual) {
+                    "login" -> {
+                        LoginScreen(
+                            onJogar = { nome ->
+                                nomeJogador = nome
+                                telaAtual = "simon"
+                            },
+                            onAdmin = {
+                                nomeJogador = "Administrador"
+                                telaAtual = "simon"
+                            }
+                        )
+                    }
 
-                    LoginScreen(
-                        onJogar = { nome ->
-                            nomeJogador = nome
-                            telaAtual = "simon"
-                        },
-                        onAdmin = {
-                            nomeJogador = "Administrador"
-                            telaAtual = "simon"
-                        }
-                    )
+                    "simon" -> {
+                        SimonScreen(
+                            nomeJogador = nomeJogador,
+                            onAbaSelecionada = { aba ->
+                                when (aba) {
+                                    "Jogar" -> telaAtual = "simon"
+                                    "Desafios" -> telaAtual = "desafios"
+                                    // Quando fizerem as outras telas:
+                                    // "Ranking" -> telaAtual = "ranking"
+                                    // "Opções" -> telaAtual = "opcoes"
+                                }
+                            }
+                        )
+                    }
 
-                } else {
-
-                    SimonScreen(
-                        nomeJogador = nomeJogador
-                    )
+                    "desafios" -> {
+                        DesafiosScreen(
+                            onAbaSelecionada = { aba ->
+                                when (aba) {
+                                    "Jogar" -> telaAtual = "simon"
+                                    "Desafios" -> telaAtual = "desafios"
+                                }
+                            },
+                            onJogarDesafio = { desafio ->
+                                telaAtual = "simon"
+                            }
+                        )
+                    }
                 }
             }
         }

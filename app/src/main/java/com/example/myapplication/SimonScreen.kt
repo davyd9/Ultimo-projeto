@@ -37,7 +37,7 @@ private val NomesCores = listOf(
 )
 
 @Composable
-fun SimonScreen(nomeJogador: String) {
+fun SimonScreen(nomeJogador: String, onAbaSelecionada: (String) -> Unit = {}) {
 
     val sequencia = remember { mutableStateListOf<Int>() }
     val scope = rememberCoroutineScope()
@@ -361,21 +361,20 @@ fun SimonScreen(nomeJogador: String) {
                 .padding(vertical = 10.dp),
             horizontalArrangement = Arrangement.SpaceAround
         ) {
-
-            MenuItem("♧", "Jogar", abaSelecionada) {
-                abaSelecionada = "Jogar"
+            MenuItem("♧", "Jogar", "Jogar") {
+                onAbaSelecionada("Jogar")
             }
 
-            MenuItem("ϟ", "Desafios", abaSelecionada) {
-                abaSelecionada = "Desafios"
+            MenuItem("ϟ", "Desafios", "Jogar") {
+                onAbaSelecionada("Desafios")
             }
 
-            MenuItem("♜", "Ranking", abaSelecionada) {
-                abaSelecionada = "Ranking"
+            MenuItem("♜", "Ranking", "Jogar") {
+                onAbaSelecionada("Ranking")
             }
 
-            MenuItem("⚙", "Opções", abaSelecionada) {
-                abaSelecionada = "Opções"
+            MenuItem("⚙", "Opções", "Jogar") {
+                onAbaSelecionada("Opções")
             }
         }
     }
