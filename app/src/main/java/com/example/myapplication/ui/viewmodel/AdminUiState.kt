@@ -1,6 +1,6 @@
-package com.example.myapplication.ui
+package com.example.myapplication.ui.viewmodel
 
-import com.example.myapplication.data.local.DesafioEntity
+import com.example.myapplication.data.model.DesafioEntity
 
 data class AdminUiState(
     val nomeDesafio: String = "",

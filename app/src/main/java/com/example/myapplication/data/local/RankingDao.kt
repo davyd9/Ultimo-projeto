@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.example.myapplication.data.model.RankingEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -14,11 +15,20 @@ interface RankingDao {
     @Query("SELECT * FROM ranking_table")
     fun listarTodos(): Flow<List<RankingEntity>>
 
+    @Query("SELECT * FROM ranking_table")
+    suspend fun listarTodosSnapshot(): List<RankingEntity>
+
+    @Query("SELECT * FROM ranking_table WHERE id = :id LIMIT 1")
+    suspend fun obterPorId(id: Int): RankingEntity?
+
+    @Query("SELECT * FROM ranking_table WHERE LOWER(apelido) = LOWER(:apelido) LIMIT 1")
+    suspend fun obterPorApelido(apelido: String): RankingEntity?
+
     @Query("SELECT COUNT(*) FROM ranking_table")
     suspend fun contarRegistros(): Int
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun inserir(registro: RankingEntity)
+    suspend fun inserir(registro: RankingEntity): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun inserirTodos(registros: List<RankingEntity>)

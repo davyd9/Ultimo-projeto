@@ -1,18 +1,28 @@
 package com.example.myapplication.data.repository
 
 import com.example.myapplication.data.local.DesafioDao
-import com.example.myapplication.data.local.DesafioLocalEntity
-import com.example.myapplication.data.remote.FirebaseDesafioSource
+import com.example.myapplication.data.model.DesafioEntity
+import com.example.myapplication.data.remote.FirebaseSource
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 
 class DesafioRepository(
     private val desafioDao: DesafioDao,
-    private val firebaseSource: FirebaseDesafioSource = FirebaseDesafioSource()
+    private val firebaseSource: FirebaseSource = FirebaseSource()
 ) {
 
-    fun observarDesafios(onError: (String) -> Unit = {}): Flow<List<DesafioLocalEntity>> {
+    private val _desafioAtivoId = MutableStateFlow<String?>(null)
+    val desafioAtivoId: StateFlow<String?> = _desafioAtivoId.asStateFlow()
+
+    fun selecionarDesafioParaJogar(desafioId: String?) {
+        _desafioAtivoId.value = desafioId
+    }
+
+    fun observarDesafios(onError: (String) -> Unit = {}): Flow<List<DesafioEntity>> {
         return try {
             desafioDao.listarTodos().catch { e ->
                 onError("Erro ao observar desafios locais no Room: ${e.localizedMessage ?: "Falha desconhecida"}")
@@ -26,24 +36,21 @@ class DesafioRepository(
 
     suspend fun inicializarESincronizarDesafios(): Result<Boolean> {
         return try {
-            // 1. Garante o seed inicial no Room caso o banco esteja vazio
             if (desafioDao.contarRegistros() == 0) {
                 desafioDao.inserirTodos(obterDesafiosIniciaisPadrao())
             }
 
-            // 2. Tenta sincronizar com o Firebase Firestore (Modo Híbrido com fallback local)
             val sincronizadoNuvem = try {
                 val remotos = firebaseSource.buscarDesafiosRemotos()
                 if (remotos.isNotEmpty()) {
                     desafioDao.inserirTodos(remotos)
                 } else {
-                    // Se a coleção remota estiver vazia e Firebase ativo, sobe os iniciais
-                    val locais = obterDesafiosIniciaisPadrao()
-                    locais.forEach { firebaseSource.publicarDesafioNoFirebase(it) }
+                    obterDesafiosIniciaisPadrao().forEach { desafio ->
+                        firebaseSource.publicarDesafioNoFirebase(desafio)
+                    }
                 }
                 true
             } catch (_: Exception) {
-                // Fallback seguro quando o google-services.json ainda não foi adicionado
                 true
             }
 
@@ -53,50 +60,42 @@ class DesafioRepository(
         }
     }
 
-    suspend fun criarDesafio(desafio: DesafioLocalEntity): Result<Unit> {
+    suspend fun criarDesafio(desafio: DesafioEntity): Result<Unit> {
         return try {
-            // Persiste localmente no Room para atualização reativa imediata
             desafioDao.inserir(desafio)
-
-            // Tenta publicar no Firebase Firestore isolando falha de nuvem via try-catch
             try {
                 firebaseSource.publicarDesafioNoFirebase(desafio)
             } catch (_: Exception) {
-                // Mantém salvo localmente no Room caso o Firebase ainda não esteja configurado
             }
-
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(Exception("Falha ao publicar desafio: ${e.localizedMessage}", e))
         }
     }
 
-    suspend fun atualizarDesafio(desafio: DesafioLocalEntity): Result<Unit> {
+    suspend fun atualizarDesafio(desafio: DesafioEntity): Result<Unit> {
         return try {
             desafioDao.atualizar(desafio)
-
             try {
                 firebaseSource.atualizarDesafioNoFirebase(desafio)
             } catch (_: Exception) {
-                // Mantém atualizado localmente no Room caso o Firebase não esteja ativo
             }
-
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(Exception("Falha ao atualizar desafio: ${e.localizedMessage}", e))
         }
     }
 
-    suspend fun excluirDesafio(desafio: DesafioLocalEntity): Result<Unit> {
+    suspend fun excluirDesafio(desafio: DesafioEntity): Result<Unit> {
         return try {
             desafioDao.deletar(desafio)
-
+            if (_desafioAtivoId.value == desafio.id) {
+                _desafioAtivoId.value = null
+            }
             try {
                 firebaseSource.excluirDesafioNoFirebase(desafio.id)
             } catch (_: Exception) {
-                // Mantém excluído localmente no Room caso o Firebase não esteja ativo
             }
-
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(Exception("Falha ao excluir desafio: ${e.localizedMessage}", e))
@@ -104,34 +103,31 @@ class DesafioRepository(
     }
 
     companion object {
-        fun obterDesafiosIniciaisPadrao(): List<DesafioLocalEntity> {
+        fun obterDesafiosIniciaisPadrao(): List<DesafioEntity> {
             return listOf(
-                DesafioLocalEntity(
+                DesafioEntity(
                     id = "mestre",
                     titulo = "Nível Mestre",
                     sequenciaCores = "Verde, Azul, Vermelho, Amarelo, Verde, Azul, Vermelho, Amarelo",
                     dificuldade = "Difícil",
                     recordePts = 340,
-                    velocidadeMs = 600L,
-                    sincronizado = true
+                    velocidadeMs = 600L
                 ),
-                DesafioLocalEntity(
+                DesafioEntity(
                     id = "relampago",
                     titulo = "Ritmo Relâmpago",
                     sequenciaCores = "Amarelo, Verde, Azul, Vermelho, Verde, Azul",
                     dificuldade = "Médio",
                     recordePts = 220,
-                    velocidadeMs = 300L,
-                    sincronizado = true
+                    velocidadeMs = 300L
                 ),
-                DesafioLocalEntity(
+                DesafioEntity(
                     id = "primeiros_passos",
                     titulo = "Primeiros Passos",
                     sequenciaCores = "Verde, Vermelho, Amarelo, Azul",
                     dificuldade = "Fácil",
                     recordePts = 100,
-                    velocidadeMs = 600L,
-                    sincronizado = true
+                    velocidadeMs = 600L
                 )
             )
         }

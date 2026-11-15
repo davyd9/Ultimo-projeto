@@ -1,8 +1,8 @@
-package com.example.myapplication.ui
+package com.example.myapplication.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.myapplication.data.local.DesafioEntity
+import com.example.myapplication.data.model.DesafioEntity
 import com.example.myapplication.data.repository.DesafioRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import java.util.UUID
 
 class AdminViewModel(
-    private val repository: DesafioRepository
+    private val desafioRepository: DesafioRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AdminUiState(isLoading = true))
@@ -26,20 +26,19 @@ class AdminViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
-            val initResult = repository.inicializarESincronizarDesafios()
+            val initResult = desafioRepository.inicializarESincronizarDesafios()
             initResult.onSuccess { online ->
                 _uiState.update { it.copy(isOnline = online) }
             }.onFailure { erro ->
                 _uiState.update { it.copy(errorMessage = erro.message, isLoading = false) }
             }
 
-            repository.observarDesafios(
+            desafioRepository.observarDesafios(
                 onError = { msgErro ->
                     _uiState.update { it.copy(errorMessage = msgErro, isLoading = false) }
                 }
             ).collect { listaBruta ->
-                // Uso obrigatório de lambdas Kotlin (.filter, .sortedBy e .map)
-                val desafiosProcessados = listaBruta
+                val processados = listaBruta
                     .filter { desafio -> desafio.titulo.isNotBlank() }
                     .sortedBy { desafio ->
                         when (desafio.dificuldade.lowercase()) {
@@ -57,7 +56,7 @@ class AdminViewModel(
 
                 _uiState.update {
                     it.copy(
-                        desafios = desafiosProcessados,
+                        desafios = processados,
                         isLoading = false
                     )
                 }
@@ -116,7 +115,7 @@ class AdminViewModel(
         }
 
         if (coresValidas.isEmpty()) {
-            _uiState.update { it.copy(errorMessage = "Informe ao menos uma sequência de cores (ex: Verde, Azul, Vermelho).") }
+            _uiState.update { it.copy(errorMessage = "Informe a sequência de cores separada por vírgula.") }
             return
         }
 
@@ -141,15 +140,14 @@ class AdminViewModel(
             sequenciaCores = sequenciaFormatada,
             dificuldade = dificuldadeNormalizada,
             recordePts = recordePadrao,
-            velocidadeMs = velocidadePadraoMs,
-            sincronizado = true
+            velocidadeMs = velocidadePadraoMs
         )
 
         viewModelScope.launch {
             val resultado = if (idEdicao == null) {
-                repository.criarDesafio(entidade)
+                desafioRepository.criarDesafio(entidade)
             } else {
-                repository.atualizarDesafio(entidade)
+                desafioRepository.atualizarDesafio(entidade)
             }
 
             resultado.onSuccess {
@@ -170,7 +168,7 @@ class AdminViewModel(
 
     fun excluirDesafio(desafio: DesafioEntity) {
         viewModelScope.launch {
-            val resultado = repository.excluirDesafio(desafio)
+            val resultado = desafioRepository.excluirDesafio(desafio)
             resultado.onSuccess {
                 if (_uiState.value.desafioEmEdicaoId == desafio.id) {
                     cancelarEdicao()

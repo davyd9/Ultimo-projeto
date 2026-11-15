@@ -1,11 +1,13 @@
-package com.example.myapplication.ui
+package com.example.myapplication.ui.screens
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -23,6 +25,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.myapplication.ui.viewmodel.RankingJogadorUi
+import com.example.myapplication.ui.viewmodel.RankingUiState
 
 private val RoxoRanking = Color(0xFF5145AA)
 private val FundoRanking = Color(0xFFFCF9FF)
@@ -39,130 +43,106 @@ fun RankingScreen(
     onFiltroChange: (String) -> Unit,
     onAlternarOrdenacao: () -> Unit,
     onEditarJogador: (RankingJogadorUi) -> Unit,
-    onExcluirJogador: (RankingJogadorUi) -> Unit,
-    onAbaSelecionada: (String) -> Unit = {}
+    onExcluirJogador: (RankingJogadorUi) -> Unit
 ) {
-    val filtros = listOf("Todos", "Fácil", "Difícil")
+    val filtros = listOf("Todos", "Fácil", "Médio", "Difícil")
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(FundoRanking)
             .statusBarsPadding()
-            .navigationBarsPadding()
+            .padding(horizontal = 20.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = 20.dp)
+        Spacer(modifier = Modifier.height(22.dp))
+
+        RankingTopHeader()
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Spacer(modifier = Modifier.height(25.dp))
-
-            // Cabeçalho
-            RankingTopHeader()
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // Linha de Filtros e Ordenação
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .weight(1f)
+                    .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    filtros.forEach { filtro ->
-                        FiltroChipItem(
-                            label = filtro,
-                            selecionado = uiState.filtroAtivo == filtro,
-                            onClick = { onFiltroChange(filtro) }
-                        )
-                    }
-                }
-
-                Row(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .clickable { onAlternarOrdenacao() }
-                        .padding(horizontal = 6.dp, vertical = 6.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.FilterList,
-                        contentDescription = "Ordenar por pontos",
-                        tint = RoxoRanking,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = "Pontos",
-                        color = RoxoRanking,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.SemiBold
+                filtros.forEach { filtro ->
+                    FiltroChipItem(
+                        label = filtro,
+                        selecionado = uiState.filtroAtivo == filtro,
+                        onClick = { onFiltroChange(filtro) }
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.width(6.dp))
 
-            // Exibição de erro caso ocorra falha capturada pelo try-catch no Repository
-            uiState.errorMessage?.let { erro ->
-                Surface(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 8.dp),
-                    shape = RoundedCornerShape(10.dp),
-                    color = Color(0xFFFDECEC)
-                ) {
-                    Text(
-                        text = erro,
-                        color = VermelhoLixeira,
-                        fontSize = 12.sp,
-                        modifier = Modifier.padding(10.dp)
-                    )
-                }
-            }
-
-            // Lista Dinâmica Obrigatória (LazyColumn)
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(bottom = 16.dp)
+            Row(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .clickable { onAlternarOrdenacao() }
+                    .padding(horizontal = 6.dp, vertical = 6.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                items(
-                    items = uiState.jogadores,
-                    key = { jogador -> jogador.id }
-                ) { jogador ->
-                    RankingRowItem(
-                        jogador = jogador,
-                        onEditar = { onEditarJogador(jogador) },
-                        onExcluir = { onExcluirJogador(jogador) }
-                    )
-                    HorizontalDivider(
-                        color = Color(0xFFECE8F4),
-                        thickness = 1.dp
-                    )
-                }
+                Icon(
+                    imageVector = Icons.Default.FilterList,
+                    contentDescription = "Ordenar por pontos",
+                    tint = RoxoRanking,
+                    modifier = Modifier.size(16.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = "Pontos",
+                    color = RoxoRanking,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
             }
         }
 
-        // Bottom Navigation Bar
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp)
-                .background(
-                    Color(0xFF8989F1),
-                    RoundedCornerShape(topStart = 18.dp, topEnd = 18.dp)
+        Spacer(modifier = Modifier.height(14.dp))
+
+        uiState.errorMessage?.let { erro ->
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                shape = RoundedCornerShape(10.dp),
+                color = Color(0xFFFDECEC)
+            ) {
+                Text(
+                    text = erro,
+                    color = VermelhoLixeira,
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(10.dp)
                 )
-                .padding(vertical = 10.dp),
-            horizontalArrangement = Arrangement.SpaceAround
+            }
+        }
+
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(bottom = 16.dp)
         ) {
-            RankingMenuItem("♧", "Jogar", "Ranking") { onAbaSelecionada("Jogar") }
-            RankingMenuItem("ϟ", "Desafios", "Ranking") { onAbaSelecionada("Desafios") }
-            RankingMenuItem("♜", "Ranking", "Ranking") { onAbaSelecionada("Ranking") }
-            RankingMenuItem("⚙", "Opções", "Ranking") { onAbaSelecionada("Opções") }
+            items(
+                items = uiState.jogadores,
+                key = { jogador -> jogador.id }
+            ) { jogador ->
+                RankingRowItem(
+                    jogador = jogador,
+                    onEditar = { onEditarJogador(jogador) },
+                    onExcluir = { onExcluirJogador(jogador) }
+                )
+                HorizontalDivider(
+                    color = Color(0xFFECE8F4),
+                    thickness = 1.dp
+                )
+            }
         }
     }
 }
@@ -177,7 +157,7 @@ private fun RankingTopHeader() {
         Column {
             Text(
                 text = "MELHORES JOGADORES",
-                fontSize = 11.sp,
+                fontSize = 10.sp,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 1.sp,
                 color = RoxoRanking
@@ -223,7 +203,7 @@ private fun FiltroChipItem(
         border = if (selecionado) null else BorderStroke(1.dp, Color(0xFFD9D4E4))
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 12.dp),
+            modifier = Modifier.padding(horizontal = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
@@ -232,13 +212,13 @@ private fun FiltroChipItem(
                     imageVector = Icons.Default.Check,
                     contentDescription = null,
                     tint = RoxoRanking,
-                    modifier = Modifier.size(14.dp)
+                    modifier = Modifier.size(13.dp)
                 )
-                Spacer(modifier = Modifier.width(5.dp))
+                Spacer(modifier = Modifier.width(4.dp))
             }
             Text(
                 text = label,
-                fontSize = 13.sp,
+                fontSize = 12.sp,
                 fontWeight = if (selecionado) FontWeight.SemiBold else FontWeight.Medium,
                 color = if (selecionado) RoxoRanking else Color(0xFF4A4656)
             )
@@ -347,48 +327,5 @@ private fun RankingRowItem(
                 modifier = Modifier.size(19.dp)
             )
         }
-    }
-}
-
-@Composable
-private fun RankingMenuItem(
-    icone: String,
-    titulo: String,
-    selecionado: String,
-    onClick: () -> Unit
-) {
-    val ativo = selecionado == titulo
-
-    Column(
-        modifier = Modifier
-            .clickable { onClick() }
-            .width(76.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Box(
-            modifier = Modifier
-                .width(66.dp)
-                .height(38.dp)
-                .background(
-                    if (ativo) Color(0xFFE3DAFF) else Color.Transparent,
-                    RoundedCornerShape(22.dp)
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = icone,
-                fontSize = 23.sp,
-                color = if (ativo) RoxoRanking else Color.White
-            )
-        }
-
-        Spacer(modifier = Modifier.height(4.dp))
-
-        Text(
-            text = titulo,
-            fontSize = 11.sp,
-            fontWeight = if (ativo) FontWeight.Bold else FontWeight.Normal,
-            color = if (ativo) Color(0xFF302966) else Color.White
-        )
     }
 }

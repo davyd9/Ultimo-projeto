@@ -1,4 +1,4 @@
-package com.example.myapplication.ui
+package com.example.myapplication.ui.screens
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -27,7 +27,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.myapplication.data.local.DesafioEntity
+import com.example.myapplication.data.model.DesafioEntity
+import com.example.myapplication.ui.viewmodel.AdminUiState
+import com.example.myapplication.ui.viewmodel.AdminViewModel
 
 private val AzulEscuroHeader = Color(0xFF211D3A)
 private val ContainerCadeado = Color(0xFF322C56)
@@ -57,7 +59,6 @@ fun AdminScreen(
             .background(FundoAdmin)
             .navigationBarsPadding()
     ) {
-        // 1. Cabeçalho Escuro Superior (Top Header Admin)
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -124,7 +125,7 @@ fun AdminScreen(
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = if (uiState.isOnline) "Online" else "Local",
+                            text = "Online",
                             fontSize = 11.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = Color.White
@@ -134,7 +135,6 @@ fun AdminScreen(
             }
         }
 
-        // Conteúdo Principal (Formulário + Lista Dinâmica LazyColumn)
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -142,7 +142,6 @@ fun AdminScreen(
             contentPadding = PaddingValues(top = 20.dp, bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            // 2. Card Principal de Formulário ("Novo desafio")
             item {
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
@@ -178,7 +177,7 @@ fun AdminScreen(
 
                             Icon(
                                 imageVector = Icons.Outlined.CloudDone,
-                                contentDescription = "Sincronização Firebase",
+                                contentDescription = "Nuvem",
                                 tint = RoxoAdmin,
                                 modifier = Modifier.size(22.dp)
                             )
@@ -186,7 +185,6 @@ fun AdminScreen(
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        // Campo 1: Nome do Desafio
                         AdminInputField(
                             label = "Nome do Desafio",
                             value = uiState.nomeDesafio,
@@ -196,7 +194,6 @@ fun AdminScreen(
 
                         Spacer(modifier = Modifier.height(10.dp))
 
-                        // Campo 2: Sequência de Cores
                         AdminInputField(
                             label = "Sequência de Cores",
                             value = uiState.sequenciaCores,
@@ -206,7 +203,6 @@ fun AdminScreen(
 
                         Spacer(modifier = Modifier.height(10.dp))
 
-                        // Campo 3: Dificuldade
                         AdminInputField(
                             label = "Dificuldade",
                             value = uiState.dificuldade,
@@ -273,7 +269,6 @@ fun AdminScreen(
                 }
             }
 
-            // 3. Cabeçalho da Seção "Desafios cadastrados"
             item {
                 Row(
                     modifier = Modifier
@@ -315,7 +310,6 @@ fun AdminScreen(
                 }
             }
 
-            // Lista Dinâmica de Desafios Cadastrados
             items(
                 items = uiState.desafios,
                 key = { desafio -> desafio.id }

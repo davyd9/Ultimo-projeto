@@ -1,4 +1,4 @@
-package com.example.myapplication.ui
+package com.example.myapplication.ui.screens
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -27,7 +27,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.myapplication.data.logic.VelocidadeConfigHelper
+import com.example.myapplication.ui.viewmodel.EditarRegistroUiState
+import com.example.myapplication.ui.viewmodel.EditarRegistroViewModel
 
 private val RoxoEdicao = Color(0xFF5145AA)
 private val FundoEdicao = Color(0xFFFCF9FF)
@@ -38,27 +39,14 @@ private val BordaVermelhaSuave = Color(0xFFE6C8C4)
 
 @Composable
 fun EditarRegistroScreen(
-    jogador: RankingJogadorUi,
+    uiState: EditarRegistroUiState,
+    onApelidoChange: (String) -> Unit,
+    onVelocidadeChange: (String) -> Unit,
     onVoltar: () -> Unit,
-    onSalvarAlteracoes: (novoApelido: String, novaVelocidadePadrao: String) -> Unit,
+    onSalvarAlteracoes: () -> Unit,
     onExcluirRegistro: () -> Unit
 ) {
-    var apelido by remember(jogador.id, jogador.apelido) {
-        mutableStateOf(jogador.apelido)
-    }
-    var velocidadeSelecionada by remember(jogador.id, jogador.velocidadePadrao) {
-        mutableStateOf(jogador.velocidadePadrao)
-    }
     var menuVelocidadeAberto by remember { mutableStateOf(false) }
-
-    val inicialAtual = apelido
-        .trim()
-        .firstOrNull()
-        ?.uppercaseChar()
-        ?.toString()
-        ?: jogador.inicial.ifBlank { "M" }
-
-    val infoVelocidade = VelocidadeConfigHelper.obterInfoVelocidade(velocidadeSelecionada)
 
     Column(
         modifier = Modifier
@@ -68,7 +56,6 @@ fun EditarRegistroScreen(
             .navigationBarsPadding()
             .verticalScroll(rememberScrollState())
     ) {
-        // Top Bar
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -97,7 +84,7 @@ fun EditarRegistroScreen(
                     color = Color(0xFF1A1A22)
                 )
                 Text(
-                    text = "Ranking #${jogador.posicao} • ${jogador.pontos} pontos",
+                    text = "Ranking #${uiState.posicao} • ${uiState.pontos} pontos",
                     fontSize = 12.sp,
                     color = Color(0xFF8E8A98)
                 )
@@ -117,7 +104,6 @@ fun EditarRegistroScreen(
         ) {
             Spacer(modifier = Modifier.height(28.dp))
 
-            // Bloco Central de Perfil
             Box(
                 modifier = Modifier.size(86.dp)
             ) {
@@ -130,7 +116,7 @@ fun EditarRegistroScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = inicialAtual,
+                        text = uiState.inicial,
                         fontSize = 32.sp,
                         fontWeight = FontWeight.ExtraBold,
                         color = Color.White
@@ -176,7 +162,6 @@ fun EditarRegistroScreen(
 
             Spacer(modifier = Modifier.height(26.dp))
 
-            // Campo 1: Apelido do Jogador
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(14.dp),
@@ -195,8 +180,8 @@ fun EditarRegistroScreen(
                     )
                     Spacer(modifier = Modifier.height(6.dp))
                     BasicTextField(
-                        value = apelido,
-                        onValueChange = { apelido = it },
+                        value = uiState.apelido,
+                        onValueChange = onApelidoChange,
                         singleLine = true,
                         textStyle = TextStyle(
                             fontSize = 16.sp,
@@ -211,7 +196,6 @@ fun EditarRegistroScreen(
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // Campo 2: Velocidade / dificuldade padrão
             Box(modifier = Modifier.fillMaxWidth()) {
                 Surface(
                     modifier = Modifier
@@ -234,7 +218,7 @@ fun EditarRegistroScreen(
                         )
                         Spacer(modifier = Modifier.height(6.dp))
                         Text(
-                            text = velocidadeSelecionada,
+                            text = uiState.velocidadePadrao,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Medium,
                             color = Color(0xFF1E1E24)
@@ -247,17 +231,17 @@ fun EditarRegistroScreen(
                     onDismissRequest = { menuVelocidadeAberto = false },
                     modifier = Modifier.background(Color.White)
                 ) {
-                    VelocidadeConfigHelper.opcoesVelocidade.forEach { opcao ->
+                    EditarRegistroViewModel.opcoesVelocidade.forEach { opcao ->
                         DropdownMenuItem(
                             text = {
                                 Text(
                                     text = opcao,
-                                    fontWeight = if (opcao == velocidadeSelecionada) FontWeight.Bold else FontWeight.Normal,
-                                    color = if (opcao == velocidadeSelecionada) RoxoEdicao else Color(0xFF1E1E24)
+                                    fontWeight = if (opcao == uiState.velocidadePadrao) FontWeight.Bold else FontWeight.Normal,
+                                    color = if (opcao == uiState.velocidadePadrao) RoxoEdicao else Color(0xFF1E1E24)
                                 )
                             },
                             onClick = {
-                                velocidadeSelecionada = opcao
+                                onVelocidadeChange(opcao)
                                 menuVelocidadeAberto = false
                             }
                         )
@@ -267,7 +251,6 @@ fun EditarRegistroScreen(
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // Card Informativo Lilás (#F0ECFC)
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(14.dp),
@@ -290,14 +273,14 @@ fun EditarRegistroScreen(
 
                     Column {
                         Text(
-                            text = infoVelocidade.titulo,
+                            text = uiState.tituloVelocidadeInfo,
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFF3F3586)
                         )
                         Spacer(modifier = Modifier.height(2.dp))
                         Text(
-                            text = infoVelocidade.subtitulo,
+                            text = uiState.subtituloVelocidadeInfo,
                             fontSize = 12.sp,
                             color = Color(0xFF7A7685)
                         )
@@ -305,13 +288,19 @@ fun EditarRegistroScreen(
                 }
             }
 
+            uiState.errorMessage?.let { erro ->
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    text = erro,
+                    color = VermelhoExcluir,
+                    fontSize = 12.sp
+                )
+            }
+
             Spacer(modifier = Modifier.height(34.dp))
 
-            // Botão Primário: Salvar Alterações
             Button(
-                onClick = {
-                    onSalvarAlteracoes(apelido, velocidadeSelecionada)
-                },
+                onClick = onSalvarAlteracoes,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(54.dp),
@@ -331,7 +320,6 @@ fun EditarRegistroScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Botão Secundário: Excluir Registro
             OutlinedButton(
                 onClick = onExcluirRegistro,
                 modifier = Modifier

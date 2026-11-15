@@ -1,6 +1,6 @@
-package com.example.myapplication.ui
+package com.example.myapplication.ui.viewmodel
 
-import com.example.myapplication.data.local.RankingEntity
+import com.example.myapplication.data.model.RankingEntity
 
 data class RankingJogadorUi(
     val id: Int,
@@ -24,10 +24,8 @@ data class RankingJogadorUi(
 
 data class RankingUiState(
     val jogadores: List<RankingJogadorUi> = emptyList(),
-    val todosJogadores: List<RankingJogadorUi> = emptyList(),
     val filtroAtivo: String = "Todos",
     val ordenacaoDecrescente: Boolean = true,
-    val jogadorSelecionado: RankingJogadorUi? = null,
     val isLoading: Boolean = false,
     val errorMessage: String? = null
 )
