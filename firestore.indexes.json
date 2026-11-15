@@ -1,0 +1,19 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "desafios",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "dificuldade",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "recordePts",
+          "order": "DESCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

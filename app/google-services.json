@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "35157641013",
+    "project_id": "golden-bloom-377322",
+    "storage_bucket": "golden-bloom-377322.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:35157641013:android:0b95082b69f56ce0f8ae7c",
+        "android_client_info": {
+          "package_name": "com.example.myapplication"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAJ9D7QH196wW7UFHMYq4B-EOt4m91jBWo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

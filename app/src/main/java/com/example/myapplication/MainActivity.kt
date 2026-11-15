@@ -6,7 +6,12 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.data.local.AppDatabase
+import com.example.myapplication.data.remote.FirebaseDesafioSource
+import com.example.myapplication.data.repository.DesafioRepository
 import com.example.myapplication.data.repository.RankingRepository
+import com.example.myapplication.ui.AdminScreen
+import com.example.myapplication.ui.AdminViewModel
+import com.example.myapplication.ui.AdminViewModelFactory
 import com.example.myapplication.ui.EditarRegistroScreen
 import com.example.myapplication.ui.RankingJogadorUi
 import com.example.myapplication.ui.RankingScreen
@@ -23,6 +28,7 @@ class MainActivity : ComponentActivity() {
             MyApplicationTheme {
 
                 val database = remember { AppDatabase.getInstance(applicationContext) }
+
                 val rankingRepository = remember {
                     RankingRepository(
                         rankingDao = database.rankingDao(),
@@ -33,6 +39,17 @@ class MainActivity : ComponentActivity() {
                     factory = RankingViewModelFactory(rankingRepository)
                 )
                 val rankingUiState by rankingViewModel.uiState.collectAsState()
+
+                val desafioRepository = remember {
+                    DesafioRepository(
+                        desafioDao = database.desafioDao(),
+                        firebaseSource = FirebaseDesafioSource()
+                    )
+                }
+                val adminViewModel: AdminViewModel = viewModel(
+                    factory = AdminViewModelFactory(desafioRepository)
+                )
+                val adminUiState by adminViewModel.uiState.collectAsState()
 
                 var telaAtual by remember {
                     mutableStateOf("login")
@@ -63,7 +80,24 @@ class MainActivity : ComponentActivity() {
                             },
                             onAdmin = {
                                 nomeJogador = "Administrador"
-                                telaAtual = "simon"
+                                telaAtual = "admin"
+                            }
+                        )
+                    }
+
+                    "admin" -> {
+                        AdminScreen(
+                            uiState = adminUiState,
+                            onNomeChange = { adminViewModel.atualizarNomeDesafio(it) },
+                            onSequenciaChange = { adminViewModel.atualizarSequenciaCores(it) },
+                            onDificuldadeChange = { adminViewModel.atualizarDificuldade(it) },
+                            onPublicarOuSalvar = { adminViewModel.publicarOuSalvarDesafio() },
+                            onEditarDesafio = { desafio -> adminViewModel.carregarParaEdicao(desafio) },
+                            onExcluirDesafio = { desafio -> adminViewModel.excluirDesafio(desafio) },
+                            onCancelarEdicao = { adminViewModel.cancelarEdicao() },
+                            onVoltarLogin = {
+                                adminViewModel.cancelarEdicao()
+                                telaAtual = "login"
                             }
                         )
                     }
@@ -77,6 +111,7 @@ class MainActivity : ComponentActivity() {
 
                     "desafios" -> {
                         DesafiosScreen(
+                            desafiosSincronizados = adminUiState.desafios,
                             onAbaSelecionada = navegarParaAba,
                             onJogarDesafio = { desafio ->
                                 telaAtual = "simon"

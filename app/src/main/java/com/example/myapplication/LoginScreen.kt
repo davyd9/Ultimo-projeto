@@ -92,7 +92,12 @@ fun LoginScreen(
 
         Button(
             onClick = {
-                onJogar(nome.trim().ifBlank { "Jogador" })
+                val entrada = nome.trim()
+                if (entrada.equals("admin", ignoreCase = true) || entrada == "1234") {
+                    onAdmin()
+                } else {
+                    onJogar(entrada.ifBlank { "Jogador" })
+                }
             },
             modifier = Modifier
                 .fillMaxWidth()

@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.myapplication.data.local.DesafioEntity
 
 private val RoxoDesafios = Color(0xFF5145AA)
 private val FundoDesafios = Color(0xFFFCF9FF)
@@ -65,10 +66,11 @@ data class DesafioItem(
 
 @Composable
 fun DesafiosScreen(
+    desafiosSincronizados: List<DesafioEntity>? = null,
     onAbaSelecionada: (String) -> Unit = {},
     onJogarDesafio: (DesafioItem) -> Unit = {}
 ) {
-    val desafios = remember {
+    val desafiosPadrao = remember {
         listOf(
             DesafioItem(
                 id = "mestre",
@@ -98,6 +100,38 @@ fun DesafiosScreen(
                 velocidadeMs = 600L
             )
         )
+    }
+
+    val desafios = remember(desafiosSincronizados) {
+        desafiosSincronizados?.map { entidade ->
+            val cores = entidade.sequenciaCores
+                .split(",")
+                .map { it.trim() }
+                .filter { it.isNotEmpty() }
+            val qtdCores = if (cores.isNotEmpty()) cores.size else 4
+
+            val enumDif = when (entidade.dificuldade.lowercase()) {
+                "difícil", "dificil" -> Dificuldade.DIFICIL
+                "médio", "medio" -> Dificuldade.MEDIO
+                else -> Dificuldade.FACIL
+            }
+
+            val descricaoFormatada = if (enumDif == Dificuldade.MEDIO || entidade.velocidadeMs <= 300L) {
+                "$qtdCores cores • velocidade rápida"
+            } else {
+                "$qtdCores cores na sequência"
+            }
+
+            DesafioItem(
+                id = entidade.id,
+                titulo = entidade.titulo,
+                descricao = descricaoFormatada,
+                dificuldade = enumDif,
+                recordePts = entidade.recordePts,
+                tamanhoSequencia = qtdCores,
+                velocidadeMs = entidade.velocidadeMs
+            )
+        } ?: desafiosPadrao
     }
 
     var energia by remember { mutableIntStateOf(5) }

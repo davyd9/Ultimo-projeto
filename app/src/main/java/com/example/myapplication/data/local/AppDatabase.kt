@@ -6,14 +6,19 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 @Database(
-    entities = [RankingEntity::class, PerfilConfigEntity::class],
-    version = 1,
+    entities = [
+        RankingEntity::class,
+        PerfilConfigEntity::class,
+        DesafioLocalEntity::class
+    ],
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun rankingDao(): RankingDao
     abstract fun perfilConfigDao(): PerfilConfigDao
+    abstract fun desafioDao(): DesafioDao
 
     companion object {
         @Volatile
