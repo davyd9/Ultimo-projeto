@@ -12,7 +12,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.outlined.Bolt
 import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.Edit
@@ -45,8 +44,7 @@ fun EditarRegistroScreen(
     onVelocidadeChange: (String) -> Unit,
     onVoltar: () -> Unit,
     onSalvarAlteracoes: () -> Unit,
-    onExcluirRegistro: () -> Unit,
-    onSair: () -> Unit = {}
+    onExcluirRegistro: () -> Unit
 ) {
     var menuVelocidadeAberto by remember { mutableStateOf(false) }
 
@@ -62,66 +60,34 @@ fun EditarRegistroScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
+            IconButton(
+                onClick = onVoltar,
+                modifier = Modifier.size(36.dp)
             ) {
-                IconButton(
-                    onClick = onVoltar,
-                    modifier = Modifier.size(36.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                        contentDescription = "Voltar para o Ranking",
-                        tint = Color(0xFF1E1E24),
-                        modifier = Modifier.size(28.dp)
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(6.dp))
-
-                Column {
-                    Text(
-                        text = "Editar Registro",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = Color(0xFF1A1A22)
-                    )
-                    Text(
-                        text = "Ranking #${uiState.posicao} • ${uiState.pontos} pontos",
-                        fontSize = 12.sp,
-                        color = Color(0xFF8E8A98)
-                    )
-                }
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                    contentDescription = "Voltar para o Ranking",
+                    tint = Color(0xFF1E1E24),
+                    modifier = Modifier.size(28.dp)
+                )
             }
 
-            Surface(
-                shape = RoundedCornerShape(12.dp),
-                color = Color(0xFFEDE8FA),
-                modifier = Modifier
-                    .clip(RoundedCornerShape(12.dp))
-                    .clickable { onSair() }
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 7.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Outlined.Logout,
-                        contentDescription = "Sair e trocar perfil",
-                        tint = RoxoEdicao,
-                        modifier = Modifier.size(15.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = "Sair",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = RoxoEdicao
-                    )
-                }
+            Spacer(modifier = Modifier.width(6.dp))
+
+            Column {
+                Text(
+                    text = "Editar Registro",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Color(0xFF1A1A22)
+                )
+                Text(
+                    text = "Ranking #${uiState.posicao} • ${uiState.pontos} pontos",
+                    fontSize = 12.sp,
+                    color = Color(0xFF8E8A98)
+                )
             }
         }
 

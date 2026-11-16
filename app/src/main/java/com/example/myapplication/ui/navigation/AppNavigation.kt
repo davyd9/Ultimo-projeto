@@ -48,9 +48,6 @@ import com.example.myapplication.ui.viewmodel.LoginViewModel
 import com.example.myapplication.ui.viewmodel.RankingViewModel
 import com.example.myapplication.ui.viewmodel.SimonViewModel
 
-/**
- * Objeto centralizador das 6 rotas de navegação do aplicativo Simon Master.
- */
 object Rotas {
     const val LOGIN = "login"
     const val SIMON = "simon"
@@ -68,11 +65,6 @@ private data class BottomNavItem(
     val icone: ImageVector
 )
 
-/**
- * Estrutura global de navegação (NavHost + Bottom Navigation Bar).
- * Gerencia o fluxo entre os 6 destinos, a bifurcação de acesso (Modo Jogador vs. Modo Administrador),
- * o logout limpo de perfil e o redirecionamento imediato para a Tela Inicial após exclusão de registro.
- */
 @Composable
 fun AppNavigation(
     factory: AppViewModelFactory,
@@ -81,7 +73,6 @@ fun AppNavigation(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val rotaAtual = navBackStackEntry?.destination?.route
 
-    // A Bottom Navigation Bar é exibida nas abas principais do Modo Jogador
     val exibirBottomBar = rotaAtual in listOf(
         Rotas.SIMON,
         Rotas.DESAFIOS,
@@ -94,7 +85,6 @@ fun AppNavigation(
     val simonViewModel: SimonViewModel = viewModel(factory = factory)
     val simonUiState by simonViewModel.uiState.collectAsState()
 
-    // Ação compartilhada para desvincular o jogador ativo (Logout) e retornar de forma limpa para a Tela Inicial (Login)
     val sairERetornarAoLogin: () -> Unit = {
         loginViewModel.sairDoPerfil()
         simonViewModel.resetarPartida()
@@ -124,7 +114,6 @@ fun AppNavigation(
             startDestination = Rotas.LOGIN,
             modifier = Modifier.padding(innerPadding)
         ) {
-            // DESTINO 1: Tela Inicial de Login (Seleção de Perfil Jogador ou Painel Admin)
             composable(Rotas.LOGIN) {
                 LoginScreen(
                     uiState = loginUiState,
@@ -151,15 +140,10 @@ fun AppNavigation(
                                 launchSingleTop = true
                             }
                         }
-                    },
-                    onSairPerfil = {
-                        loginViewModel.sairDoPerfil()
-                        simonViewModel.resetarPartida()
                     }
                 )
             }
 
-            // DESTINO 2: Tela Principal do Jogo Simon
             composable(Rotas.SIMON) {
                 SimonScreen(
                     uiState = simonUiState,
@@ -170,7 +154,6 @@ fun AppNavigation(
                 )
             }
 
-            // DESTINO 3: Tela de Desafios Sincronizados com o Firebase Firestore
             composable(Rotas.DESAFIOS) {
                 val desafiosViewModel: DesafiosViewModel = viewModel(factory = factory)
                 val desafiosUiState by desafiosViewModel.uiState.collectAsState()
@@ -182,12 +165,10 @@ fun AppNavigation(
                         navController.navigate(Rotas.SIMON) {
                             launchSingleTop = true
                         }
-                    },
-                    onSair = sairERetornarAoLogin
+                    }
                 )
             }
 
-            // DESTINO 4: Tela de Ranking Local (Room Database)
             composable(Rotas.RANKING) {
                 val rankingViewModel: RankingViewModel = viewModel(factory = factory)
                 val rankingUiState by rankingViewModel.uiState.collectAsState()
@@ -201,12 +182,10 @@ fun AppNavigation(
                     },
                     onExcluirJogador = { jogador ->
                         rankingViewModel.excluirJogador(jogador)
-                    },
-                    onSair = sairERetornarAoLogin
+                    }
                 )
             }
 
-            // DESTINO 5: Tela de Editar Registro / Opções (Tela 05)
             composable(
                 route = Rotas.EDITAR_REGISTRO,
                 arguments = listOf(
@@ -243,16 +222,13 @@ fun AppNavigation(
                         }
                     },
                     onExcluirRegistro = {
-                        // Exclui o registro no Room, limpa o jogador ativo e força retorno imediato à Tela Inicial (Login)
                         editarViewModel.excluirRegistroAtual {
                             sairERetornarAoLogin()
                         }
-                    },
-                    onSair = sairERetornarAoLogin
+                    }
                 )
             }
 
-            // DESTINO 6: Tela de Administração / Painel Admin (Tela 06)
             composable(Rotas.ADMIN) {
                 val adminViewModel: AdminViewModel = viewModel(factory = factory)
                 val adminUiState by adminViewModel.uiState.collectAsState()
@@ -265,16 +241,10 @@ fun AppNavigation(
                     onPublicarOuSalvar = { adminViewModel.publicarOuSalvarDesafio() },
                     onEditarDesafio = { desafio -> adminViewModel.carregarParaEdicao(desafio) },
                     onExcluirDesafio = { desafio ->
-                        // Deleta o desafio no Room/Firebase, limpa estado ativo e retorna à Tela Inicial (Login)
-                        adminViewModel.excluirDesafio(desafio) {
-                            sairERetornarAoLogin()
-                        }
+                        adminViewModel.excluirDesafio(desafio)
                     },
                     onExcluirRegistroEmEdicao = {
-                        // Deleta o desafio em edição no formulário e retorna imediatamente à Tela Inicial (Login)
-                        adminViewModel.excluirDesafioEmEdicao {
-                            sairERetornarAoLogin()
-                        }
+                        adminViewModel.excluirDesafioEmEdicao()
                     },
                     onCancelarEdicao = { adminViewModel.cancelarEdicao() },
                     onVoltarLogin = {
@@ -287,9 +257,6 @@ fun AppNavigation(
     }
 }
 
-/**
- * Barra de navegação inferior (Bottom Navigation Bar) exibida nas telas do Modo Jogador.
- */
 @Composable
 private fun SimonBottomNavigationBar(
     rotaAtual: String?,

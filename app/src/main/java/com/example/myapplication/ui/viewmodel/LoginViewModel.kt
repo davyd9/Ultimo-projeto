@@ -84,10 +84,6 @@ class LoginViewModel(
         }
     }
 
-    /**
-     * Desvincula o usuário ativo (jogadorAtivoId e nomeJogadorEscolhido) no repositório
-     * e restaura o estado limpo da tela inicial de Login.
-     */
     fun sairDoPerfil() {
         rankingRepository.limparJogadorAtivo()
         _uiState.update {

@@ -2,14 +2,12 @@ package com.example.myapplication.ui.screens
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.outlined.Bolt
 import androidx.compose.material.icons.outlined.CloudDone
 import androidx.compose.material.icons.outlined.EmojiEvents
@@ -33,8 +31,7 @@ private val FundoDesafios = Color(0xFFFCF9FF)
 @Composable
 fun DesafiosScreen(
     uiState: DesafiosUiState,
-    onJogarDesafio: (DesafioItemUi) -> Unit,
-    onSair: () -> Unit = {}
+    onJogarDesafio: (DesafioItemUi) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier
@@ -46,10 +43,7 @@ fun DesafiosScreen(
         contentPadding = PaddingValues(top = 22.dp, bottom = 20.dp)
     ) {
         item {
-            DesafiosTopHeader(
-                energia = uiState.energia,
-                onSair = onSair
-            )
+            DesafiosTopHeader(energia = uiState.energia)
         }
 
         item {
@@ -99,10 +93,7 @@ fun DesafiosScreen(
 }
 
 @Composable
-private fun DesafiosTopHeader(
-    energia: Int,
-    onSair: () -> Unit
-) {
+private fun DesafiosTopHeader(energia: Int) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -124,59 +115,27 @@ private fun DesafiosTopHeader(
             )
         }
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        Surface(
+            shape = RoundedCornerShape(12.dp),
+            color = Color(0xFFEDE8FA)
         ) {
-            Surface(
-                shape = RoundedCornerShape(12.dp),
-                color = Color(0xFFEDE8FA)
+            Row(
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Bolt,
-                        contentDescription = "Energia",
-                        tint = RoxoDesafios,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Text(
-                        text = energia.toString(),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
-                        color = RoxoDesafios
-                    )
-                }
-            }
-
-            Surface(
-                shape = RoundedCornerShape(12.dp),
-                color = Color(0xFFEDE8FA),
-                modifier = Modifier
-                    .clip(RoundedCornerShape(12.dp))
-                    .clickable { onSair() }
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Outlined.Logout,
-                        contentDescription = "Sair para o Login",
-                        tint = RoxoDesafios,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = "Sair",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = RoxoDesafios
-                    )
-                }
+                Icon(
+                    imageVector = Icons.Outlined.Bolt,
+                    contentDescription = "Energia",
+                    tint = RoxoDesafios,
+                    modifier = Modifier.size(18.dp)
+                )
+                Text(
+                    text = energia.toString(),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp,
+                    color = RoxoDesafios
+                )
             }
         }
     }

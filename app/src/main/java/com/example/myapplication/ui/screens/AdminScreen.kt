@@ -10,7 +10,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.outlined.Bolt
 import androidx.compose.material.icons.outlined.CloudDone
 import androidx.compose.material.icons.outlined.CloudUpload
@@ -32,7 +31,6 @@ import com.example.myapplication.data.model.DesafioEntity
 import com.example.myapplication.ui.viewmodel.AdminUiState
 import com.example.myapplication.ui.viewmodel.AdminViewModel
 
-// Paleta de cores do Painel Administrador
 private val AzulEscuroHeader = Color(0xFF211D3A)
 private val ContainerCadeado = Color(0xFF322C56)
 private val RoxoAdmin = Color(0xFF5145AA)
@@ -44,11 +42,6 @@ private val BordaInput = Color(0xFF938F99)
 private val VermelhoLixeiraAdmin = Color(0xFFB83B2A)
 private val BordaVermelhaSuaveAdmin = Color(0xFFE6C8C4)
 
-/**
- * Tela 06 - Painel Administrador (AdminScreen).
- * Permite ao Administrador realizar o CRUD completo (Criar, Ler, Atualizar e Excluir)
- * de desafios sincronizados entre o Firebase Cloud Firestore e o Room Database.
- */
 @Composable
 fun AdminScreen(
     uiState: AdminUiState,
@@ -62,14 +55,12 @@ fun AdminScreen(
     onCancelarEdicao: () -> Unit,
     onVoltarLogin: () -> Unit
 ) {
-    // Estrutura vertical principal ocupando toda a tela
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(FundoAdmin)
             .navigationBarsPadding()
     ) {
-        // 1. Cabeçalho Superior Escuro (Top Header Admin) com indicador Online e botão Sair
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -82,7 +73,6 @@ fun AdminScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Bloco esquerdo: Ícone de cadeado + Título do Painel Admin
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -116,72 +106,37 @@ fun AdminScreen(
                             text = "Gerenciar Desafios",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.ExtraBold,
-                            color = Color.White
+                            color = Color(0xFF1A1A22).let { Color.White }
                         )
                     }
                 }
 
-                // Bloco direito: Indicador de sincronização "Online" + Botão de "Sair"
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                Surface(
+                    shape = RoundedCornerShape(20.dp),
+                    color = Color(0xFF2D284B)
                 ) {
-                    Surface(
-                        shape = RoundedCornerShape(20.dp),
-                        color = Color(0xFF2D284B)
+                    Row(
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(8.dp)
-                                    .clip(CircleShape)
-                                    .background(if (uiState.isOnline) VerdeOnline else Color.Gray)
-                            )
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text(
-                                text = "Online",
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = Color.White
-                            )
-                        }
-                    }
-
-                    // Botão de Sair que desvincula a sessão atual e retorna para a Tela Inicial (Login)
-                    Surface(
-                        shape = RoundedCornerShape(20.dp),
-                        color = Color(0xFF3A3264),
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(20.dp))
-                            .clickable { onVoltarLogin() }
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Outlined.Logout,
-                                contentDescription = "Sair do Painel Admin",
-                                tint = Color.White,
-                                modifier = Modifier.size(14.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = "Sair",
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White
-                            )
-                        }
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .clip(CircleShape)
+                                .background(if (uiState.isOnline) VerdeOnline else Color.Gray)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "Online",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color.White
+                        )
                     }
                 }
             }
         }
 
-        // 2. Lista Rolável Principal (Formulário CRUD + Lista Dinâmica de Desafios)
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -189,7 +144,6 @@ fun AdminScreen(
             contentPadding = PaddingValues(top = 20.dp, bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            // Card de Formulário ("Novo desafio" / "Editar desafio")
             item {
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
@@ -233,7 +187,6 @@ fun AdminScreen(
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        // Input 1: Nome do Desafio
                         AdminInputField(
                             label = "Nome do Desafio",
                             value = uiState.nomeDesafio,
@@ -243,7 +196,6 @@ fun AdminScreen(
 
                         Spacer(modifier = Modifier.height(10.dp))
 
-                        // Input 2: Sequência de Cores
                         AdminInputField(
                             label = "Sequência de Cores",
                             value = uiState.sequenciaCores,
@@ -253,7 +205,6 @@ fun AdminScreen(
 
                         Spacer(modifier = Modifier.height(10.dp))
 
-                        // Input 3: Dificuldade
                         AdminInputField(
                             label = "Dificuldade",
                             value = uiState.dificuldade,
@@ -261,7 +212,6 @@ fun AdminScreen(
                             onValueChange = onDificuldadeChange
                         )
 
-                        // Exibição condicional de mensagens de erro tratadas pelo ViewModel/Repository
                         uiState.errorMessage?.let { erro ->
                             Spacer(modifier = Modifier.height(10.dp))
                             Surface(
@@ -280,7 +230,6 @@ fun AdminScreen(
 
                         Spacer(modifier = Modifier.height(14.dp))
 
-                        // Botão de ação principal (Publicar novo desafio ou Salvar desafio em edição no Firebase)
                         Button(
                             onClick = onPublicarOuSalvar,
                             modifier = Modifier
@@ -305,11 +254,9 @@ fun AdminScreen(
                             )
                         }
 
-                        // Botões adicionais exibidos quando um registro está selecionado para edição
                         if (uiState.emModoEdicao) {
                             Spacer(modifier = Modifier.height(10.dp))
 
-                            // Botão "Excluir Registro": remove do Room/Firebase e retorna à Tela Inicial de Login
                             OutlinedButton(
                                 onClick = onExcluirRegistroEmEdicao,
                                 modifier = Modifier
@@ -354,7 +301,6 @@ fun AdminScreen(
                 }
             }
 
-            // 3. Cabeçalho da Seção "Desafios cadastrados"
             item {
                 Row(
                     modifier = Modifier
@@ -396,7 +342,6 @@ fun AdminScreen(
                 }
             }
 
-            // 4. Listagem dinâmica (LazyColumn items) dos desafios vindos do Flow
             items(
                 items = uiState.desafios,
                 key = { desafio -> desafio.id }
@@ -411,9 +356,6 @@ fun AdminScreen(
     }
 }
 
-/**
- * Componente reutilizável de campo de texto estilizado do formulário administrativo.
- */
 @Composable
 private fun AdminInputField(
     label: String,
@@ -466,9 +408,6 @@ private fun AdminInputField(
     }
 }
 
-/**
- * Card individual de desafio exibido na lista do Painel Admin com ações de Editar e Excluir.
- */
 @Composable
 private fun DesafioAdminCard(
     desafio: DesafioEntity,

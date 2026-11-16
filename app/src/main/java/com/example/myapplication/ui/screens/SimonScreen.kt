@@ -135,7 +135,6 @@ fun SimonScreen(
                     }
                 }
 
-                // Botão de Sair (Logout / Trocar Perfil) na tela principal do jogo
                 Surface(
                     shape = RoundedCornerShape(14.dp),
                     color = Color(0xFFEDE8FA),

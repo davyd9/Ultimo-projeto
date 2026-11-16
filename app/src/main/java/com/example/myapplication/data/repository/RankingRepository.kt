@@ -19,10 +19,6 @@ class RankingRepository(
     private val _nomeJogadorEscolhido = MutableStateFlow<String?>(null)
     val nomeJogadorEscolhido: StateFlow<String?> = _nomeJogadorEscolhido.asStateFlow()
 
-    /**
-     * Limpa o estado do jogador ativo (desvincula ID e nome escolhido)
-     * ao excluir o registro ativo ou acionar o botão de Sair (Logout / Trocar Perfil).
-     */
     fun limparJogadorAtivo() {
         _jogadorAtivoId.value = null
         _nomeJogadorEscolhido.value = null

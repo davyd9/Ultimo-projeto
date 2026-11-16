@@ -10,29 +10,18 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 
-/**
- * Repositório híbrido (Offline-First) para gerenciamento dos Desafios.
- * Coordena a persistência local reativa no Room (DesafioDao) com a sincronização em nuvem
- * no Firebase Cloud Firestore (FirebaseSource), isolando exceções com blocos try-catch.
- */
 class DesafioRepository(
     private val desafioDao: DesafioDao,
     private val firebaseSource: FirebaseSource = FirebaseSource()
 ) {
 
-    // Armazena o ID do desafio atualmente selecionado para partida na tela do jogo Simon.
     private val _desafioAtivoId = MutableStateFlow<String?>(null)
     val desafioAtivoId: StateFlow<String?> = _desafioAtivoId.asStateFlow()
 
-    // Define ou limpa o desafio ativo selecionado pelo jogador.
     fun selecionarDesafioParaJogar(desafioId: String?) {
         _desafioAtivoId.value = desafioId
     }
 
-    /**
-     * Expõe o fluxo contínuo (Flow) de desafios vindos do Room Database.
-     * Qualquer alteração no banco dispara uma nova emissão para o AdminViewModel e DesafiosViewModel.
-     */
     fun observarDesafios(onError: (String) -> Unit = {}): Flow<List<DesafioEntity>> {
         return try {
             desafioDao.listarTodos().catch { e ->
@@ -45,17 +34,12 @@ class DesafioRepository(
         }
     }
 
-    /**
-     * Garante o seed inicial no banco local e sincroniza bidirecionalmente com o Firebase Firestore.
-     */
     suspend fun inicializarESincronizarDesafios(): Result<Boolean> {
         return try {
-            // 1. Popula o banco local Room caso ainda não existam registros.
             if (desafioDao.contarRegistros() == 0) {
                 desafioDao.inserirTodos(obterDesafiosIniciaisPadrao())
             }
 
-            // 2. Sincroniza com a coleção "desafios" do Firebase Firestore (com fallback seguro offline).
             val sincronizadoNuvem = try {
                 val remotos = firebaseSource.buscarDesafiosRemotos()
                 if (remotos.isNotEmpty()) {
@@ -76,9 +60,6 @@ class DesafioRepository(
         }
     }
 
-    /**
-     * Cria um novo desafio salvando imediatamente no Room e publicando no Firebase Firestore.
-     */
     suspend fun criarDesafio(desafio: DesafioEntity): Result<Unit> {
         return try {
             desafioDao.inserir(desafio)
@@ -92,9 +73,6 @@ class DesafioRepository(
         }
     }
 
-    /**
-     * Atualiza um desafio existente no Room e sincroniza a alteração no Firebase Firestore.
-     */
     suspend fun atualizarDesafio(desafio: DesafioEntity): Result<Unit> {
         return try {
             desafioDao.atualizar(desafio)
@@ -108,9 +86,6 @@ class DesafioRepository(
         }
     }
 
-    /**
-     * Exclui um desafio do banco local Room e remove o documento correspondente no Firebase Firestore.
-     */
     suspend fun excluirDesafio(desafio: DesafioEntity): Result<Unit> {
         return try {
             desafioDao.deletar(desafio)
@@ -128,7 +103,6 @@ class DesafioRepository(
     }
 
     companion object {
-        // Lista de desafios iniciais padrão (Fácil, Médio e Difícil) para seed local e remoto.
         fun obterDesafiosIniciaisPadrao(): List<DesafioEntity> {
             return listOf(
                 DesafioEntity(

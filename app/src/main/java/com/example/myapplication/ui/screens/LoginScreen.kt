@@ -11,7 +11,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.PlayArrow
@@ -43,8 +42,7 @@ fun LoginScreen(
     onTextoChange: (String) -> Unit,
     onHabilitarEdicao: () -> Unit,
     onClicarJogar: () -> Unit,
-    onClicarAdmin: () -> Unit,
-    onSairPerfil: () -> Unit = {}
+    onClicarAdmin: () -> Unit
 ) {
     val nomeJaConfirmado = !uiState.nomeEscolhido.isNullOrBlank() && !uiState.editandoNomeOuCodigo
 
@@ -201,62 +199,30 @@ fun LoginScreen(
                         )
                     }
 
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                    Surface(
+                        shape = RoundedCornerShape(10.dp),
+                        color = Color(0xFFEDE8FA),
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(10.dp))
+                            .clickable { onHabilitarEdicao() }
                     ) {
-                        Surface(
-                            shape = RoundedCornerShape(10.dp),
-                            color = Color(0xFFEDE8FA),
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(10.dp))
-                                .clickable { onHabilitarEdicao() }
+                        Row(
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Row(
-                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Outlined.Edit,
-                                    contentDescription = "Editar nome ou inserir Código Admin",
-                                    tint = RoxoLogin,
-                                    modifier = Modifier.size(14.dp)
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(
-                                    text = "Editar",
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = RoxoLogin
-                                )
-                            }
-                        }
-
-                        Surface(
-                            shape = RoundedCornerShape(10.dp),
-                            color = Color(0xFFFDECEC),
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(10.dp))
-                                .clickable { onSairPerfil() }
-                        ) {
-                            Row(
-                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Outlined.Logout,
-                                    contentDescription = "Sair do perfil atual",
-                                    tint = VermelhoErroLogin,
-                                    modifier = Modifier.size(14.dp)
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(
-                                    text = "Sair",
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = VermelhoErroLogin
-                                )
-                            }
+                            Icon(
+                                imageVector = Icons.Outlined.Edit,
+                                contentDescription = "Editar nome ou inserir Código Admin",
+                                tint = RoxoLogin,
+                                modifier = Modifier.size(14.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "Editar / Admin",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = RoxoLogin
+                            )
                         }
                     }
                 }
