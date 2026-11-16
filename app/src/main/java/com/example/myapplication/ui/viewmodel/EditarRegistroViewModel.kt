@@ -104,10 +104,16 @@ class EditarRegistroViewModel(
         }
     }
 
+    /**
+     * Exclui o registro atual do banco Room, limpa o estado do jogador ativo
+     * (jogadorAtivoId e nomeJogadorEscolhido) no repositório e aciona o callback
+     * para redirecionar imediatamente à Tela Inicial de Login.
+     */
     fun excluirRegistroAtual(onConcluido: () -> Unit) {
         viewModelScope.launch {
             val estado = _uiState.value
             if (estado.id == 0) {
+                rankingRepository.limparJogadorAtivo()
                 onConcluido()
                 return@launch
             }
@@ -120,6 +126,7 @@ class EditarRegistroViewModel(
             )
             val resultado = rankingRepository.deletarRegistro(entidade)
             resultado.onSuccess {
+                rankingRepository.limparJogadorAtivo()
                 onConcluido()
             }.onFailure { erro ->
                 _uiState.update { it.copy(errorMessage = erro.message) }

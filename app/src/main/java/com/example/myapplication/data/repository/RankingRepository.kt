@@ -19,6 +19,15 @@ class RankingRepository(
     private val _nomeJogadorEscolhido = MutableStateFlow<String?>(null)
     val nomeJogadorEscolhido: StateFlow<String?> = _nomeJogadorEscolhido.asStateFlow()
 
+    /**
+     * Limpa o estado do jogador ativo (desvincula ID e nome escolhido)
+     * ao excluir o registro ativo ou acionar o botão de Sair (Logout / Trocar Perfil).
+     */
+    fun limparJogadorAtivo() {
+        _jogadorAtivoId.value = null
+        _nomeJogadorEscolhido.value = null
+    }
+
     fun observarRanking(onError: (String) -> Unit = {}): Flow<List<RankingEntity>> {
         return try {
             rankingDao.listarTodos().catch { exception ->
@@ -35,13 +44,6 @@ class RankingRepository(
         return try {
             if (rankingDao.contarRegistros() == 0) {
                 rankingDao.inserirTodos(obterRegistrosIniciaisPadrao())
-            }
-            if (_jogadorAtivoId.value == null) {
-                val marina = rankingDao.obterPorApelido("Marina")
-                    ?: rankingDao.listarTodosSnapshot().firstOrNull()
-                if (marina != null) {
-                    _jogadorAtivoId.value = marina.id
-                }
             }
             Result.success(Unit)
         } catch (e: Exception) {
@@ -62,9 +64,11 @@ class RankingRepository(
             }
 
             val idAtivo = _jogadorAtivoId.value
-            val registroBase = (if (idAtivo != null) rankingDao.obterPorId(idAtivo) else null)
-                ?: rankingDao.obterPorApelido("Marina")
-                ?: rankingDao.listarTodosSnapshot().firstOrNull()
+            val registroBase = if (idAtivo != null) {
+                rankingDao.obterPorId(idAtivo)
+            } else {
+                rankingDao.obterPorApelido("Marina")
+            }
 
             if (registroBase != null) {
                 val atualizado = registroBase.copy(apelido = nomeLimpo)
@@ -106,7 +110,7 @@ class RankingRepository(
             val jogador = (if (idAtivo != null) rankingDao.obterPorId(idAtivo) else null)
                 ?: rankingDao.obterPorApelido("Marina")
                 ?: rankingDao.listarTodosSnapshot().firstOrNull()
-            if (jogador != null) {
+            if (jogador != null && _jogadorAtivoId.value == null && _nomeJogadorEscolhido.value != null) {
                 _jogadorAtivoId.value = jogador.id
             }
             Result.success(jogador)
@@ -167,12 +171,8 @@ class RankingRepository(
     suspend fun deletarRegistro(registro: RankingEntity): Result<Unit> {
         return try {
             rankingDao.deletar(registro)
-            if (_jogadorAtivoId.value == registro.id) {
-                val proximo = rankingDao.listarTodosSnapshot().firstOrNull()
-                _jogadorAtivoId.value = proximo?.id
-                if (_nomeJogadorEscolhido.value != null) {
-                    _nomeJogadorEscolhido.value = proximo?.apelido
-                }
+            if (_jogadorAtivoId.value == registro.id || _nomeJogadorEscolhido.value.equals(registro.apelido, ignoreCase = true)) {
+                limparJogadorAtivo()
             }
             Result.success(Unit)
         } catch (e: Exception) {

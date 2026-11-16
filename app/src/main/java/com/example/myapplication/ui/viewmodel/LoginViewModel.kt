@@ -30,7 +30,7 @@ class LoginViewModel(
                 rankingRepository.jogadorAtivoId,
                 rankingRepository.observarRanking()
             ) { nomeEscolhido, idAtivo, listaRanking ->
-                val registroAtivo = listaRanking.find { it.id == idAtivo }
+                val registroAtivo = if (idAtivo != null) listaRanking.find { it.id == idAtivo } else null
                 if (nomeEscolhido != null) {
                     registroAtivo?.apelido ?: nomeEscolhido
                 } else {
@@ -42,6 +42,16 @@ class LoginViewModel(
                         atual.copy(
                             nomeEscolhido = nomeSincronizado,
                             textoEntrada = if (!atual.editandoNomeOuCodigo) nomeSincronizado else atual.textoEntrada
+                        )
+                    }
+                } else {
+                    _uiState.update {
+                        LoginUiState(
+                            textoEntrada = "",
+                            nomeEscolhido = null,
+                            editandoNomeOuCodigo = true,
+                            isAdminAutenticado = false,
+                            errorMessage = null
                         )
                     }
                 }
@@ -69,6 +79,23 @@ class LoginViewModel(
             it.copy(
                 editandoNomeOuCodigo = false,
                 textoEntrada = salvo,
+                errorMessage = null
+            )
+        }
+    }
+
+    /**
+     * Desvincula o usuário ativo (jogadorAtivoId e nomeJogadorEscolhido) no repositório
+     * e restaura o estado limpo da tela inicial de Login.
+     */
+    fun sairDoPerfil() {
+        rankingRepository.limparJogadorAtivo()
+        _uiState.update {
+            LoginUiState(
+                textoEntrada = "",
+                nomeEscolhido = null,
+                editandoNomeOuCodigo = true,
+                isAdminAutenticado = false,
                 errorMessage = null
             )
         }

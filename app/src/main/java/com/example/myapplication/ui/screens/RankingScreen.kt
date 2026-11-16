@@ -11,6 +11,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.outlined.DeleteOutline
@@ -43,7 +44,8 @@ fun RankingScreen(
     onFiltroChange: (String) -> Unit,
     onAlternarOrdenacao: () -> Unit,
     onEditarJogador: (RankingJogadorUi) -> Unit,
-    onExcluirJogador: (RankingJogadorUi) -> Unit
+    onExcluirJogador: (RankingJogadorUi) -> Unit,
+    onSair: () -> Unit = {}
 ) {
     val filtros = listOf("Todos", "Fácil", "Médio", "Difícil")
 
@@ -56,7 +58,7 @@ fun RankingScreen(
     ) {
         Spacer(modifier = Modifier.height(22.dp))
 
-        RankingTopHeader()
+        RankingTopHeader(onSair = onSair)
 
         Spacer(modifier = Modifier.height(20.dp))
 
@@ -148,7 +150,7 @@ fun RankingScreen(
 }
 
 @Composable
-private fun RankingTopHeader() {
+private fun RankingTopHeader(onSair: () -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -170,18 +172,50 @@ private fun RankingTopHeader() {
             )
         }
 
-        Surface(
-            modifier = Modifier.size(46.dp),
-            shape = RoundedCornerShape(14.dp),
-            color = CremeTrofeu
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Box(contentAlignment = Alignment.Center) {
-                Icon(
-                    imageVector = Icons.Outlined.EmojiEvents,
-                    contentDescription = "Troféu",
-                    tint = DouradoTrofeu,
-                    modifier = Modifier.size(22.dp)
-                )
+            Surface(
+                modifier = Modifier.size(42.dp),
+                shape = RoundedCornerShape(14.dp),
+                color = CremeTrofeu
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = Icons.Outlined.EmojiEvents,
+                        contentDescription = "Troféu",
+                        tint = DouradoTrofeu,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
+
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = Color(0xFFEDE8FA),
+                modifier = Modifier
+                    .clip(RoundedCornerShape(12.dp))
+                    .clickable { onSair() }
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Outlined.Logout,
+                        contentDescription = "Sair para o Login",
+                        tint = RoxoRanking,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "Sair",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = RoxoRanking
+                    )
+                }
             }
         }
     }

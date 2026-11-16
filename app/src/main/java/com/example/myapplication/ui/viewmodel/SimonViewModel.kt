@@ -41,7 +41,7 @@ class SimonViewModel(
                 desafioRepository.observarDesafios(),
                 desafioRepository.desafioAtivoId
             ) { listaRanking, jogadorAtivoId, listaDesafios, desafioAtivoId ->
-                val jogadorAtivo = listaRanking.find { it.id == jogadorAtivoId }
+                val jogadorAtivo = (if (jogadorAtivoId != null) listaRanking.find { it.id == jogadorAtivoId } else null)
                     ?: listaRanking.find { it.apelido.equals("Marina", ignoreCase = true) }
                     ?: listaRanking.firstOrNull()
 
@@ -63,7 +63,7 @@ class SimonViewModel(
 
                 Triple(jogadorAtivo, desafiosOrdenados, desafioSelecionado)
             }.collect { (jogadorAtivo, desafiosOrdenados, desafioSelecionado) ->
-                val nomeJogador = jogadorAtivo?.apelido ?: "Marina"
+                val nomeJogador = jogadorAtivo?.apelido ?: "Jogador"
                 val difJogador = jogadorAtivo?.dificuldade ?: "Fácil"
                 val velPadraoJogador = jogadorAtivo?.velocidadePadrao ?: "Lenta • Fácil"
 
@@ -116,6 +116,24 @@ class SimonViewModel(
 
     fun selecionarModoJogo(desafio: DesafioEntity) {
         desafioRepository.selecionarDesafioParaJogar(desafio.id)
+    }
+
+    fun resetarPartida() {
+        sequenciaAtual.clear()
+        indiceJogador = 0
+        desafioRepository.selecionarDesafioParaJogar(null)
+        _uiState.update {
+            it.copy(
+                pontos = 0,
+                rodada = 1,
+                corAcesa = -1,
+                reproduzindo = false,
+                aguardandoJogador = false,
+                jogoFinalizado = false,
+                mensagemStatus = "Toque em Iniciar para começar",
+                errorMessage = null
+            )
+        }
     }
 
     fun iniciarSequencia() {

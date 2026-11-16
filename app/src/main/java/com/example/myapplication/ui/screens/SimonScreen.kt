@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.outlined.Bolt
 import androidx.compose.material.icons.outlined.EmojiEvents
 import androidx.compose.material.icons.outlined.PlayArrow
@@ -39,7 +40,8 @@ fun SimonScreen(
     uiState: SimonUiState,
     onIniciarSequencia: () -> Unit,
     onSelecionarCor: (Int) -> Unit,
-    onSelecionarModo: (DesafioEntity) -> Unit = {}
+    onSelecionarModo: (DesafioEntity) -> Unit = {},
+    onSair: () -> Unit = {}
 ) {
     var menuModosAberto by remember { mutableStateOf(false) }
 
@@ -76,54 +78,87 @@ fun SimonScreen(
                 )
             }
 
-            Surface(
-                shape = RoundedCornerShape(16.dp),
-                color = Color(0xFFF2EEFA)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                Surface(
+                    shape = RoundedCornerShape(16.dp),
+                    color = Color(0xFFF2EEFA)
                 ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = "PONTOS",
-                            fontSize = 9.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF8E8A98)
+                    Row(
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(
+                                text = "PONTOS",
+                                fontSize = 9.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF8E8A98)
+                            )
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = "${uiState.pontos}",
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = Color(0xFF282254)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(12.dp))
+
+                        Box(
+                            modifier = Modifier
+                                .width(1.dp)
+                                .height(24.dp)
+                                .background(Color(0xFFDFD9EC))
                         )
-                        Spacer(modifier = Modifier.height(2.dp))
-                        Text(
-                            text = "${uiState.pontos}",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = Color(0xFF282254)
-                        )
+
+                        Spacer(modifier = Modifier.width(12.dp))
+
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(
+                                text = "RODADA",
+                                fontSize = 9.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF8E8A98)
+                            )
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = "${uiState.rodada}",
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = Color(0xFF282254)
+                            )
+                        }
                     }
+                }
 
-                    Spacer(modifier = Modifier.width(14.dp))
-
-                    Box(
-                        modifier = Modifier
-                            .width(1.dp)
-                            .height(26.dp)
-                            .background(Color(0xFFDFD9EC))
-                    )
-
-                    Spacer(modifier = Modifier.width(14.dp))
-
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = "RODADA",
-                            fontSize = 9.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF8E8A98)
+                // Botão de Sair (Logout / Trocar Perfil) na tela principal do jogo
+                Surface(
+                    shape = RoundedCornerShape(14.dp),
+                    color = Color(0xFFEDE8FA),
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(14.dp))
+                        .clickable { onSair() }
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Outlined.Logout,
+                            contentDescription = "Sair para o Login",
+                            tint = RoxoSimon,
+                            modifier = Modifier.size(16.dp)
                         )
-                        Spacer(modifier = Modifier.height(2.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "${uiState.rodada}",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = Color(0xFF282254)
+                            text = "Sair",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = RoxoSimon
                         )
                     }
                 }
