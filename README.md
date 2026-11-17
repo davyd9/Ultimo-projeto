@@ -19,7 +19,7 @@ O sistema possui **controle e bifurcação de acesso por perfil**:
 > **[Inserir Link do Vídeo Aqui]**  
 > *Espaço reservado para o link ou embed do vídeo demonstrando o aplicativo funcionando (fluxo do Modo Jogador, Ranking Local Room e sincronização em tempo real do Painel Admin com o Firebase Firestore).*
 >
-> 🔗 **Link do Vídeo:** `[Inserir Link do Vídeo do App Funcionando Aqui]`
+> 🔗 **Link do Vídeo:** `[https://www.canva.com/design/DAHbINb5EPE/ox2UDJhXXxKcjyyWjDWFeQ/edit]`
 
 ---
 
