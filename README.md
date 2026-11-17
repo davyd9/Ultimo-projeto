@@ -27,11 +27,11 @@ O sistema possui **controle e bifurcação de acesso por perfil**:
 
 | Tela 01 — Login e Seleção de Perfil | Tela 02 — Tabuleiro do Jogo (Simon) | Tela 03 — Desafios na Nuvem |
 | :---: | :---: | :---: |
-| **[Inserir Print Aqui]**<br>*(Tela Inicial: Modo Jogador vs. Painel Admin)* | **[Inserir Print Aqui]**<br>*(Jogo Simon: Sequência de Cores, Pontos e Rodada)* | **[Inserir Print Aqui]**<br>*(Lista de Desafios Sincronizados com o Firebase)* |
+| <img src="assets/images/tela_01_login.jpeg" width="250" alt="Tela 01 - Login e Seleção de Perfil"/><br>*(Tela Inicial: Modo Jogador vs. Painel Admin)* | <img src="assets/images/tela_02_simon.jpeg" width="250" alt="Tela 02 - Tabuleiro do Jogo Simon"/><br>*(Jogo Simon: Sequência de Cores, Pontos e Rodada)* | <img src="assets/images/tela_03_desafios.jpeg" width="250" alt="Tela 03 - Desafios na Nuvem"/><br>*(Lista de Desafios Sincronizados com o Firebase)* |
 
 | Tela 04 — Ranking de Jogadores | Tela 05 — Editar Registro / Opções | Tela 06 — Painel Administrador (CRUD) |
 | :---: | :---: | :---: |
-| **[Inserir Print Aqui]**<br>*(Ranking Reativo Room com Filtros e Ordenação)* | **[Inserir Print Aqui]**<br>*(Edição de Apelido/Velocidade e Excluir Registro)* | **[Inserir Print Aqui]**<br>*(Gerenciamento de Desafios no Firebase Firestore)* |
+| <img src="assets/images/tela_04_ranking.jpeg" width="250" alt="Tela 04 - Ranking de Jogadores"/><br>*(Ranking Reativo Room com Filtros e Ordenação)* | <img src="assets/images/tela_05_editar_registro.jpeg" width="250" alt="Tela 05 - Editar Registro / Opções"/><br>*(Edição de Apelido/Velocidade e Excluir Registro)* | <img src="assets/images/tela_06_painel_admin.jpeg" width="250" alt="Tela 06 - Painel Administrador"/><br>*(Gerenciamento de Desafios no Firebase Firestore)* |
 
 ---
 
